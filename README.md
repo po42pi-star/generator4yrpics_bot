@@ -3,7 +3,6 @@
 # 🤖 Telegram AI Image Generator Bot
 
 [![n8n](https://img.shields.io/badge/n8n->=1.0-black?style=flat-square&logo=n8n)](https://n8n.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
 Telegram-бот с поддержкой AI: отвечает на сообщения через LLM (OpenRouter) и генерирует изображения по запросу (Stability AI).
 
