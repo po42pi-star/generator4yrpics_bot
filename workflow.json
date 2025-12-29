@@ -1,0 +1,272 @@
+{
+  "name": "generator4yrpics_bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["*"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-352, -32],
+      "id": "c86ed472-dfde-4c2c-b677-8fcb4a003870",
+      "name": "Telegram Trigger",
+      "webhookId": "1eef975e-a4a4-4b7d-aa3c-06c58771697a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75fab390-0d4f-4d1f-b010-872ca3917042",
+              "name": "message.text",
+              "value": "={{ $json?.message?.text ?? \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c0054f4f-fad5-4c84-acbc-1653ce44727d",
+              "name": "massage.action",
+              "value": "={{ $json.message.text.split(' ')[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": { "dotNotation": true }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-192, -32],
+      "id": "be16f9be-2e10-45fa-abbc-caa14b1e236e",
+      "name": "PreProcessing"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21dcc98a-9c0c-4624-9a69-08fb04ff508c",
+              "name": "model_temperature",
+              "value": 0.8,
+              "type": "number"
+            },
+            {
+              "id": "40ce34e2-8e64-4e28-884d-1011be5ce648",
+              "name": "token_length",
+              "value": 500,
+              "type": "number"
+            },
+            {
+              "id": "59ab9ba0-9a62-4bdc-8c28-97f8a8818bb4",
+              "name": "system_command",
+              "value": "=Ты — дружелюбный чат-бот. Имя пользователя — {{ $('Telegram Trigger').item.json?.message?.from?.first_name }}. Системный язык пользователя — {{ $('Telegram Trigger').item.json?.message?.from?.language_code }}. Сначала определи язык текста пользователя, затем ответь на том же языке. Добавь несколько подходящих эмодзи в свой ответ. Обязательно напомни пользователю, что начать запрос генерации изображений необходимо с \"/image\".",
+              "type": "string"
+            },
+            {
+              "id": "6db9c747-f725-4193-9228-e3db5d7f9ba2",
+              "name": "bot_typing",
+              "value": "={{ $json.massage.action === '/image' ? 'upload_photo' : 'typing' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-48, -32],
+      "id": "3ff8c5a7-52db-45fb-b6eb-1a9d4cf48f38",
+      "name": "Settings"
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "action": "={{ $json.bot_typing }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [144, 112],
+      "id": "effcc0d6-9f82-403b-ab14-20f58e2dd846",
+      "name": "Send a chat action",
+      "webhookId": "642daf9c-e720-4c30-abaa-b1232f360e34"
+    },
+    {
+      "parameters": { "mode": "chooseBranch" },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [320, -16],
+      "id": "a0b7f3f7-b0e5-4585-97d3-d5322e046d2b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('PreProcessing').item.json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": { "type": "string", "operation": "equals" },
+                    "id": "12ddbf70-fe0d-496b-be45-6829bf81aa04"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "68e8e03c-703f-404f-8117-da87b8a807bd",
+                    "leftValue": "={{ $('PreProcessing').item.json.message.text.split(' ')[0] }}",
+                    "rightValue": "/image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [480, -16],
+      "id": "6c8e9d6c-03ac-4606-8b28-d60053598989",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Это первое сообщение от пользователя. Поприветствуй его на языке {{ $('Telegram Trigger').item.json.message.from.language_code }}",
+        "messages": {
+          "messageValues": [{ "message": "={{ $json.system_command }}" }]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [704, -32],
+      "id": "9eca6a35-d3a7-4493-b8f0-877432b9acbb",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {
+          "maxTokens": "={{ $json.token_length }}",
+          "temperature": 0.8
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [704, 96],
+      "id": "2e3a42e0-3422-41f6-bfcd-f4f59084cf1d",
+      "name": "OpenRouter Chat Model"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1008, -32],
+      "id": "0b7f4e98-2a78-4e22-96a1-f6df0dbadcb7",
+      "name": "Send a text message",
+      "webhookId": "aaefbc1b-1830-4978-be05-bd1ce35c9eef"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1008, 240],
+      "id": "ecbbd724-0c37-4a67-8dc8-4aff663cdb82",
+      "name": "Send a photo message",
+      "webhookId": "32ece38d-faf4-4818-914f-686f4f659341"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"Authorization\": \"Bearer {{ $env.STABILITY_API_KEY }}\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text_prompts\": [\n    {\n      \"text\": \"{{ $('PreProcessing').item.json.message.text }}\"\n    }\n  ],\n  \"cfg_scale\": 7,\n  \"height\": 1024,\n  \"width\": 1024,\n  \"samples\": 1,\n  \"steps\": 20\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [704, 240],
+      "id": "b5e9de70-7df8-4664-bad4-18898258c7d4",
+      "name": "HTTP Request to StabilityAI"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.item.json;\n\nif (!response || !Array.isArray(response.artifacts) || response.artifacts.length === 0) {\n  throw new Error(\"No image generated\");\n}\n\nconst base64 = response.artifacts[0].base64;\nconst binaryData = Buffer.from(base64, 'base64');\n\nreturn [{\n  json: {},\n  binary: {\n    data: {\n      data: binaryData,\n      mimeType: 'image/png',\n      fileName: 'image.png'\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [848, 240],
+      "id": "c30e7bfc-19c6-4902-b218-4808b6b54bbb",
+      "name": "Base64 to PNG",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": true,
+      "waitBetweenTries": 3000
+    }
+  ],
+  "pinData": {
+    "PreProcessing": [{ "json": { "message": { "text": "/image of a cheerful girl on the beach" }, "massage": { "action": "/image" } } }]
+  },
+  "connections": {
+    "Telegram Trigger": { "main": [[{ "node": "PreProcessing", "type": "main", "index": 0 }]] },
+    "PreProcessing": { "main": [[{ "node": "Settings", "type": "main", "index": 0 }]] },
+    "Settings": { "main": [[{ "node": "Send a chat action", "type": "main", "index": 0 }, { "node": "Merge", "type": "main", "index": 0 }]] },
+    "Send a chat action": { "main": [[{ "node": "Merge", "type": "main", "index": 1 }]] },
+    "Merge": { "main": [[{ "node": "Switch", "type": "main", "index": 0 }]] },
+    "OpenRouter Chat Model": { "ai_languageModel": [[{ "node": "Basic LLM Chain", "type": "ai_languageModel", "index": 0 }]] },
+    "Switch": { "main": [[{ "node": "Basic LLM Chain", "type": "main", "index": 0 }], [{ "node": "HTTP Request to StabilityAI", "type": "main", "index": 0 }]] },
+    "Basic LLM Chain": { "main": [[{ "node": "Send a text message", "type": "main", "index": 0 }]] },
+    "HTTP Request to StabilityAI": { "main": [[{ "node": "Base64 to PNG", "type": "main", "index": 0 }]] },
+    "Base64 to PNG": { "main": [[{ "node": "Send a photo message", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "ebb6ec16-9ea6-4475-8379-dc941f545ee3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6487de88c455428d819be23f1f0bf3e7d7a58248882c41d5562b7c2c92ec1cf"
+  },
+  "id": "6Vd1yeD8oG0T2sVW",
+  "tags": []
+}
