@@ -112,7 +112,7 @@ Telegram Trigger → PreProcessing → Settings → Send Chat Action
 
 ## 📄 Лицензия
 
-MIT License — подробности в файле LICENSE.
+MIT License
 
 ## 🙏 Благодарности
 - [n8n](https://n8n.io/) — за мощную платформу автоматизации
