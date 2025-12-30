@@ -119,8 +119,6 @@ MIT License
 - [OpenRouter](https://openrouter.ai/) — за доступ к LLM
 - [Stability AI](https://stability.ai/) — за генерацию изображений
 
----
-
 ## 📞 Контакты
 
 **Автор**: Ivan P  
