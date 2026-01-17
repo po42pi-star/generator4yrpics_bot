@@ -81,26 +81,40 @@ generator4yrpics_bot/
     └── images/          # Скриншоты и медиа
 ```
 
+---
+
 ## 📸 Скриншоты
 
 ### Workflow в n8n
+
 ![Workflow](docs/images/n8n-workflow.png)
 
 ### Пример генерации изображений
+
 ![Генерация](docs/images/image-generation-1.png)
 
 ![Генерация](docs/images/image-generation-2.png)
 
+---
+
 ## 🔧 Workflow Overview
+
+```mermaid
+flowchart LR
+    A[Telegram Trigger] --> B[PreProcessing]
+    B --> C[Settings]
+    C --> D[Send Chat Action]
+    D --> E[Merge]
+    E --> F[Switch]
+    F --> G[Basic LLM Chain]
+    G --> H[Send Text Message]
+    F --> I[HTTP Request]
+    I --> J[Base64 to PNG]
+    J --> K[Send Photo Message]
+    C -.-> E
 ```
-Telegram Trigger → PreProcessing → Settings → Send Chat Action
-                                              ↓
-                              Merge ←─────────────┘
-                              ↓
-                           Switch ───→ Basic LLM Chain → Send Text Message
-                              ↓
-                    HTTP Request → Base64 to PNG → Send Photo Message
-```
+
+---
 
 ## 🤝 Contributing
 
@@ -110,14 +124,20 @@ Telegram Trigger → PreProcessing → Settings → Send Chat Action
 4. Pushните в ветку (git push origin feature/amazing-feature)
 5. Откройте Pull Request
 
+---
+
 ## 📄 Лицензия
 
 MIT License
+
+---
 
 ## 🙏 Благодарности
 - [n8n](https://n8n.io/) — за мощную платформу автоматизации
 - [OpenRouter](https://openrouter.ai/) — за доступ к LLM
 - [Stability AI](https://stability.ai/) — за генерацию изображений
+
+---
 
 ## 📞 Контакты
 
