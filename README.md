@@ -147,5 +147,7 @@ MIT License
 ---
 
 <div align="center">
-  Сделано в **n8️⃣n**
+
+Сделано в **n8️⃣n**
+
 </div>
