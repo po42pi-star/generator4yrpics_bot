@@ -31,7 +31,7 @@
 
 - **n8n** — платформа автоматизации
 - **Telegram Bot API** — взаимодействие с Telegram
-- **OpenRouter** — API для доступа к LLM (GPT)
+- **OpenRouter** — API для доступа к LLM (ChatGPT)
 - **Stability AI** — генерация изображений (Stable Diffusion XL)
 
 ---
@@ -58,8 +58,8 @@ cp .env.example .env
 2. Перейдите в Settings → Import
 3. Загрузите файл workflow.json
 4. Создайте credentials в n8n:
-   - Telegram Api — для Telegram
-   - OpenRouter Api — для OpenRouter
+   - Telegram API — для Telegram
+   - OpenRouter API — для OpenRouter
    - Bearer Auth — для Stability AI
 
 ### 4. Настройте Webhook
